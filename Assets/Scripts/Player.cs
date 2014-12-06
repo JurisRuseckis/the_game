@@ -12,17 +12,17 @@ public class Player : MonoBehaviour {
     //Max values
     public float MaxSpeed = 5f;
 
-    public bool IsGrounded = false;
+    private bool IsGrounded = false;
     [HideInInspector]
     public bool FacingRight = true;
 
     private Transform GroundCheck;
-	private Animator Anim;
+    public float GroundCheckDist = 0.025f;
+
 	// Use this for initialization
 	void Start () 
     {
         GroundCheck = transform.FindChild("GroundCheck");
-		Anim = GetComponent<Animator> ();
 	}
 	
     void Update()
@@ -36,8 +36,7 @@ public class Player : MonoBehaviour {
     {
         float jumpForce = 0f;
         float moveForce = 0f;
-        IsGrounded = Physics2D.OverlapCircle(GroundCheck.position, 0.025f, 1 << LayerMask.NameToLayer("Ground"));
-		Anim.SetBool ("IsGrounded", IsGrounded);
+        IsGrounded = Physics2D.OverlapCircle(GroundCheck.position, GroundCheckDist, 1 << LayerMask.NameToLayer("Ground"));
         if(IsGrounded && JumpInput)
         {
             jumpForce = JumpForce;
@@ -46,10 +45,8 @@ public class Player : MonoBehaviour {
         moveForce = MovementInput * MovementForce;
 
         rigidbody2D.AddForce(new Vector2(moveForce, jumpForce));
-		float Speed = Mathf.Abs (rigidbody2D.velocity.x);
-		Anim.SetFloat ("Speed",Speed);
 
-		if(Speed > MaxSpeed)
+        if(Mathf.Abs(rigidbody2D.velocity.x) > MaxSpeed)
         {
             rigidbody2D.velocity = new Vector2(Mathf.Sign(rigidbody2D.velocity.x) * MaxSpeed, rigidbody2D.velocity.y);
         }
